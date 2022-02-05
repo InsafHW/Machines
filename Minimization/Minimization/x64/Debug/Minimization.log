@@ -1,0 +1,6 @@
+﻿  main.cpp
+D:\STUDYIENG\5semestr\ArtemMin\Minimization\main.cpp(108,35): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+D:\STUDYIENG\5semestr\ArtemMin\Minimization\main.cpp(124,44): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+D:\STUDYIENG\5semestr\ArtemMin\Minimization\main.cpp(148,23): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+D:\STUDYIENG\5semestr\ArtemMin\Minimization\main.cpp(286,37): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+  Minimization.vcxproj -> D:\STUDYIENG\5semestr\ArtemMin\x64\Debug\Minimization.exe
