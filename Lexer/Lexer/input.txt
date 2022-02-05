@@ -1,0 +1,39 @@
+import axios from 'axios'
+
+const globalConst = 100
+
+function initHandlers(list, type) {
+	switch (type) {
+		case 'left':
+			list.children.forEach(item => {
+				item.addEventListener('click', () => {
+					console.log('clicked left', item.id)
+				})
+			})
+			break
+		case 'right':
+			list.children.forEach(item => {
+				item.addEventListener('click', () => {
+					console.log('clicked right', item.id)
+				})
+			})
+		default:
+			console.log('unknown type', type)
+	}
+}
+
+function init() {
+	console.log('init');
+	// comment
+	const modal = document.createElement('modal');
+	document.body.appendChild(modal)
+	for (let i = 0; i < 10; i = i + 1) {
+		
+	}
+}
+
+window.onload = function() {
+	init()
+	initHandlers(document.querySelector('.list-left'), 'left')
+	initHandlers(document.querySelector('.list-right'), 'right')
+}
