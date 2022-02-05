@@ -17,9 +17,6 @@ typedef map<string, Cell> Machine;
 
 const regex Regex("[a-zA-Z]+");
 
-Machine result;
-set<string> exist;
-
 void ReadR(Machine& machine, ifstream& input)
 {
 	string line;
@@ -37,11 +34,22 @@ void ReadR(Machine& machine, ifstream& input)
 			it++;
 			for (int index = 0; it != end; ++it)
 			{
+				string symbol;
+				string to;
 				match = *it;
 				string match_str = match.str();
-				match_str.size() == 2
-					? machine[from][to_string(match_str[0])].insert(to_string(match_str[1]))
-					: machine[from][to_string(match_str[0])].insert("H");
+				if (match_str.size() == 2)
+				{
+					symbol = match_str[0];
+					to = match_str[1];
+					machine[from][symbol].insert(to);
+				}
+				else
+				{
+					symbol = match_str[0];
+					to = "H";
+					machine[from][symbol].insert(to);
+				}
 			}
 		}
 	}
@@ -52,6 +60,7 @@ void ReadL(Machine& machine, ifstream& input)
 	machine["H"];
 
 	string line;
+	Cell h_cell;
 	while (getline(input, line))
 	{
 		sregex_iterator it = sregex_iterator(line.begin(), line.end(), Regex), end;
@@ -67,19 +76,25 @@ void ReadL(Machine& machine, ifstream& input)
 			{
 				match = *it;
 				string match_str = match.str();
+				string symbol;
 				if (match_str.size() == 2)
 				{
-					string symbol = to_string(match_str[1]);
+					symbol = match_str[1];
 					from = match_str[0];
 
 					auto a_it = machine.find(from);
 					if (a_it != machine.end())
 					{
-						auto c_it = (a_it->second).find(symbol);
-						auto c_end = (a_it->second).end();
-						c_it != c_end
-							? (c_it->second).insert(to)
-							: machine[from][symbol].insert(to);
+						Cell::iterator c_it = (a_it->second).find(symbol);
+						Cell::iterator c_end = (a_it->second).end();
+						if (c_it != c_end)
+						{
+							(c_it->second).insert(to);
+						}
+						else
+						{
+							machine[from][symbol].insert(to);
+						}
 					}
 					else
 					{
@@ -88,7 +103,8 @@ void ReadL(Machine& machine, ifstream& input)
 				}
 				else
 				{
-					machine["H"][to_string(match_str[0])].insert(to);
+					symbol = match_str[0];
+					machine["H"][symbol].insert(to);
 				}
 			}
 		}
@@ -104,14 +120,14 @@ Machine ReadMachine(ifstream& input, string type)
 	return machine;
 }
 
-void WriteMachine(ofstream& output, Machine::iterator& it)
+void WriteAutomaton(Machine& machine, ofstream& output, Machine::iterator& it, set<string>& history)
 {
-	if (it != result.end())
+	if (it != machine.end())
 	{
-		if (exist.find(it->first) == exist.end())
+		if (history.find(it->first) == history.end())
 		{
 			output << it->first << " -> ";
-			exist.insert(it->first);
+			history.insert(it->first);
 			size_t count = 1;
 			for (auto elem : it->second)
 			{
@@ -129,7 +145,7 @@ void WriteMachine(ofstream& output, Machine::iterator& it)
 				}
 				else
 				{
-					output << elem.first << to << endl;
+					output << elem.first << to << "\n";
 				}
 			}
 
@@ -142,25 +158,26 @@ void WriteMachine(ofstream& output, Machine::iterator& it)
 					to += str;
 				}
 
-				Machine::iterator next_it = result.find(to);
-				WriteMachine(output, next_it);
+				auto next_it = machine.find(to);
+				WriteAutomaton(machine, output, next_it, history);
 			}
 		}
 	}
 }
 
-void WriteDetermination(string type)
+void WriteDetermization(Machine& machine, string type)
 {
+	set<string> history;
 	ofstream output("output.txt");
 	auto it = type == "R"
-		? result.find("S")
-		: result.find("H");
-	WriteMachine(output, it);
+		? machine.find("S")
+		: machine.find("H");
+	WriteAutomaton(machine, output, it, history);
 }
 
-void Determinize(Machine& machine, string type)
+Machine Determinization(Machine& machine, string type)
 {
-	stack<string> nextState;
+	Machine result;
 	Machine::iterator it;
 	if (type == "R")
 	{
@@ -173,6 +190,8 @@ void Determinize(Machine& machine, string type)
 		result["H"] = it->second;
 	}
 
+	stack<string> nextState;
+
 	for (auto elem : it->second)
 	{
 		string to;
@@ -184,7 +203,7 @@ void Determinize(Machine& machine, string type)
 		nextState.push(to);
 	}
 
-	while (nextState.size())
+	while (nextState.size() != 0)
 	{
 		string from = nextState.top();
 		nextState.pop();
@@ -193,7 +212,10 @@ void Determinize(Machine& machine, string type)
 		{
 			for (size_t i = 0; i < from.size(); i++)
 			{
-				auto a_it = machine.find(to_string(from[i]));
+				string ch;
+				ch = from[i];
+
+				auto a_it = machine.find(ch);
 				if (a_it != machine.end())
 				{
 					auto c_it = a_it->second;
@@ -220,6 +242,8 @@ void Determinize(Machine& machine, string type)
 			}
 		}
 	}
+
+	return result;
 }
 
 int main()
@@ -229,7 +253,7 @@ int main()
 	getline(input, type);
 
 	auto machine = ReadMachine(input, type);
-
-	Determinize(machine, type);
-	WriteDetermination(type);
+	auto result = Determinization(machine, type);
+	WriteDetermization(result, type);
+	return 0;
 }

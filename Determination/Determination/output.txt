@@ -1,1 +1,3 @@
-H -> 97B
+H -> bS | cA
+S -> cA
+A -> aA | bS

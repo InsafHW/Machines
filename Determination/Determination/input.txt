@@ -1,5 +1,3 @@
 L
-S -> Cb
-C -> Bc
-B -> a | Da
-D -> Bc
+S -> Ab | b
+A -> Sc | c | Aa
