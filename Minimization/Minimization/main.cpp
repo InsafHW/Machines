@@ -99,9 +99,8 @@ Result GetResult(Machine& machine, EMatrix& ResultMatrix)
 	return { resultMachine, resultIndexes };
 }
 
-Result Minimize(Machine& machine, EMatrix& matrix, int& prevMachineSize)
+Result Minimize(Machine& machine, EMatrix& matrix, int prevMachineSize)
 {
-	bool isNeedMinimize = true;
 	EMatrix equivalenceMatrix;
 	for (auto it = matrix.begin(); it != matrix.end(); it++)
 	{
@@ -120,15 +119,11 @@ Result Minimize(Machine& machine, EMatrix& matrix, int& prevMachineSize)
 	OverrideAutomaton(machine, equivalenceMatrix);
 	if (equivalenceMatrix.size() == prevMachineSize)
 	{
-		isNeedMinimize = false;
 		return GetResult(machine, equivalenceMatrix);
 	}
 
 	prevMachineSize = equivalenceMatrix.size();
-	if (isNeedMinimize)
-	{
-		return Minimize(machine, matrix, prevMachineSize);
-	}
+	return Minimize(machine, matrix, prevMachineSize);
 }
 
 void ReadMilli(Machine& a, ifstream& input)
@@ -278,7 +273,6 @@ int main()
 
 	auto machine = ReadMachine(input, type);
 
-	bool isMinimized = false;
 	int machineSize = machine[0].size();
 	for (int i = 0; i < machineSize; i++)
 	{
