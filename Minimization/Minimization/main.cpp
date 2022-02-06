@@ -21,9 +21,11 @@ struct Cell
 typedef map<int, vector<int>> EMatrix;
 typedef vector<vector<Cell>> Machine;
 
-EMatrix matrix;
-Machine ResultMachine;
-vector<int> ResultIndexes;
+struct Result
+{
+	Machine resultMachine;
+	vector<int> resultIndexes;
+};
 
 void GetEquivalenceMatrix(Machine& machine, vector<int>& indexes, EMatrix& equivalenceMatrix)
 {
@@ -71,32 +73,33 @@ void OverrideAutomaton(Machine& machine, EMatrix& equivalenceMatrix)
 	}
 }
 
-void GetResult(Machine& machine, EMatrix& ResultMatrix)
+Result GetResult(Machine& machine, EMatrix& ResultMatrix)
 {
-	Machine result(machine.size(), vector<Cell>(ResultMatrix.size()));
+	vector<int> resultIndexes;
+	Machine resultMachine(machine.size(), vector<Cell>(ResultMatrix.size()));
 	EMatrix::iterator it = ResultMatrix.begin();
 
-	for (int i = 0; i < result[0].size(); i++)
+	for (int i = 0; i < resultMachine[0].size(); i++)
 	{
-		for (int j = 0; j < result.size(); j++)
+		for (int j = 0; j < resultMachine.size(); j++)
 		{
-			result[j][i] = machine[j][it->second[0]];
+			resultMachine[j][i] = machine[j][it->second[0]];
 
 			auto n = ResultMatrix.begin();
 			while (find((n->second).begin(), (n->second).end(), machine[j][it->second[0]].to) == (n->second).end())
 			{
 				n++;
 			}
-			result[j][i].to = n->second[0];
+			resultMachine[j][i].to = n->second[0];
 		}
-		ResultIndexes.push_back(it->second[0]);
+		resultIndexes.push_back(it->second[0]);
 		it++;
 	}
 
-	ResultMachine = result;
+	return { resultMachine, resultIndexes };
 }
 
-void Minimize(Machine& machine, int& prevMachineSize)
+Result Minimize(Machine& machine, EMatrix& matrix, int& prevMachineSize)
 {
 	bool isNeedMinimize = true;
 	EMatrix equivalenceMatrix;
@@ -118,13 +121,13 @@ void Minimize(Machine& machine, int& prevMachineSize)
 	if (equivalenceMatrix.size() == prevMachineSize)
 	{
 		isNeedMinimize = false;
-		GetResult(machine, equivalenceMatrix);
+		return GetResult(machine, equivalenceMatrix);
 	}
 
 	prevMachineSize = equivalenceMatrix.size();
 	if (isNeedMinimize)
 	{
-		Minimize(machine, prevMachineSize);
+		return Minimize(machine, matrix, prevMachineSize);
 	}
 }
 
@@ -209,57 +212,61 @@ Machine ReadMachine(ifstream& input, string type)
 	return machine;
 }
 
-void WriteMilli(ofstream& output)
+void WriteMilli(Result& result, ofstream& output)
 {
-	for (int i = 0; i < ResultIndexes.size(); i++)
+	auto machine = result.resultMachine;
+	auto indexes = result.resultIndexes;
+	for (int i = 0; i < indexes.size(); i++)
 	{
-		output << setw(SETW_VALUE) << "S" + to_string(ResultIndexes[i] + 1);
+		output << setw(SETW_VALUE) << "S" + to_string(indexes[i] + 1);
 	}
 	output << endl;
 
-	for (int i = 0; i < ResultMachine.size(); i++)
+	for (int i = 0; i < machine.size(); i++)
 	{
 		output << "X" << i + 1;
-		for (int j = 0; j < ResultMachine[0].size(); j++)
+		for (int j = 0; j < machine[0].size(); j++)
 		{
-			output << setw(SETW_VALUE) << right << "[S" + to_string(ResultMachine[i][j].to + 1) + ", Y" + to_string(ResultMachine[i][j].out + 1) + "]";
+			output << setw(SETW_VALUE) << right << "[S" + to_string(machine[i][j].to + 1) + ", Y" + to_string(machine[i][j].out + 1) + "]";
 		}
 		output << endl;
 	}
 }
 
-void WriteMurra(ofstream& output)
+void WriteMurra(Result& result, ofstream& output)
 {
-	for (int i = 0; i < ResultIndexes.size(); i++)
+	auto machine = result.resultMachine;
+	auto indexes = result.resultIndexes;
+	for (int i = 0; i < indexes.size(); i++)
 	{
-		output << setw(SETW_VALUE) << "Y" + to_string(ResultMachine[0][i].out + 1);
+		output << setw(SETW_VALUE) << "Y" + to_string(machine[0][i].out + 1);
 	}
 	output << endl;
 
-	for (int i = 0; i < ResultIndexes.size(); i++)
+	for (int i = 0; i < indexes.size(); i++)
 	{
-		output << setw(SETW_VALUE) << "S" + to_string(ResultIndexes[i] + 1);
+		output << setw(SETW_VALUE) << "S" + to_string(indexes[i] + 1);
 	}
 	output << endl;
 
-	for (int i = 0; i < ResultMachine.size(); i++)
+	for (int i = 0; i < machine.size(); i++)
 	{
 		output << "X" << i + 1;
-		for (int j = 0; j < ResultMachine[0].size(); j++)
+		for (int j = 0; j < machine[0].size(); j++)
 		{
-			string out = "[S" + to_string(ResultMachine[i][j].to + 1) + "]";
+			string out = "[S" + to_string(machine[i][j].to + 1) + "]";
 			output << setw(SETW_VALUE) << right << out;
 		}
 		output << endl;
 	}
 }
 
-void WriteMachine(string type)
+void WriteMachine(Result& result, string type)
 {
 	ofstream output("output.txt");
 	type == "Ml"
-		? WriteMilli(output)
-		: WriteMurra(output);
+		? WriteMilli(result, output)
+		: WriteMurra(result, output);
 }
 
 int main()
@@ -267,6 +274,7 @@ int main()
 	string type;
 	ifstream input("input.txt");
 	getline(input, type);
+	EMatrix matrix;
 
 	auto machine = ReadMachine(input, type);
 
@@ -277,6 +285,6 @@ int main()
 		matrix[0].push_back(i);
 	}
 
-	Minimize(machine, machineSize);
-	WriteMachine(type);
+	auto result = Minimize(machine, matrix, machineSize);
+	WriteMachine(result, type);
 }
