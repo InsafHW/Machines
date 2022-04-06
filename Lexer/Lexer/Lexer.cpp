@@ -179,9 +179,10 @@ int main()
 			case '=':
 				if (!singleQuouteOpened && !doubleQuoteOpened)
 				{
+					WriteToken(word, tokens, output);
+
 					output << "TOKEN=" << tokens.GetTokenData("=")->tokenName << " ; VALUE==" << endl;
 					cout << "TOKEN=" << tokens.GetTokenData("=")->tokenName << " ; VALUE==" << endl;
-					word = "";
 					continue;
 				};
 				break;

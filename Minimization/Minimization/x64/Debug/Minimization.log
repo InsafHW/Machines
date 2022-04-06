@@ -1,6 +1,6 @@
 ﻿  main.cpp
-D:\STUDYIENG\5semestr\Operating Systems\Minimization\Minimization\main.cpp(110,35): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
-D:\STUDYIENG\5semestr\Operating Systems\Minimization\Minimization\main.cpp(125,44): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
-D:\STUDYIENG\5semestr\Operating Systems\Minimization\Minimization\main.cpp(146,23): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
-D:\STUDYIENG\5semestr\Operating Systems\Minimization\Minimization\main.cpp(276,37): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+D:\STUDYIENG\5semestr\Operating Systems\Minimization\Minimization\main.cpp(110,35): warning C4267: инициализация: преобразование из "size_t" в "int"; возможна потеря данных
+D:\STUDYIENG\5semestr\Operating Systems\Minimization\Minimization\main.cpp(125,44): warning C4267: =: преобразование из "size_t" в "int"; возможна потеря данных
+D:\STUDYIENG\5semestr\Operating Systems\Minimization\Minimization\main.cpp(146,23): warning C4267: инициализация: преобразование из "size_t" в "int"; возможна потеря данных
+D:\STUDYIENG\5semestr\Operating Systems\Minimization\Minimization\main.cpp(276,37): warning C4267: инициализация: преобразование из "size_t" в "int"; возможна потеря данных
   Minimization.vcxproj -> D:\STUDYIENG\5semestr\Operating Systems\Minimization\x64\Debug\Minimization.exe
