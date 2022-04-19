@@ -1,2 +1,6 @@
-﻿  RegularExpressions.cpp
+﻿  Determinization.cpp
+  ReadRegex.cpp
+  RegexMachine.cpp
+  RegularExpressions.cpp
+  Generating Code...
   RegularExpressions.vcxproj -> D:\STUDYIENG\5semestr\Operating Systems\RegularExpressions\x64\Debug\RegularExpressions.exe

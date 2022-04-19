@@ -99,7 +99,7 @@ Result GetResult(Machine& machine, EMatrix& ResultMatrix)
 	return { resultMachine, resultIndexes };
 }
 
-Result Minimize(Machine& machine, EMatrix& matrix, int prevMachineSize)
+EMatrix MinimizeImpl(Machine& machine, EMatrix& matrix)
 {
 	EMatrix equivalenceMatrix;
 	for (auto it = matrix.begin(); it != matrix.end(); it++)
@@ -114,15 +114,20 @@ Result Minimize(Machine& machine, EMatrix& matrix, int prevMachineSize)
 			k++;
 		}
 	}
-	matrix = equivalenceMatrix;
+	return equivalenceMatrix;
+}
 
-	OverrideAutomaton(machine, equivalenceMatrix);
-	if (equivalenceMatrix.size() == prevMachineSize)
+Result Minimize(Machine& machine, EMatrix& matrix, int prevMachineSize)
+{
+	matrix = MinimizeImpl(machine, matrix);
+
+	OverrideAutomaton(machine, matrix);
+	if (matrix.size() == prevMachineSize)
 	{
-		return GetResult(machine, equivalenceMatrix);
+		return GetResult(machine, matrix);
 	}
 
-	prevMachineSize = equivalenceMatrix.size();
+	prevMachineSize = matrix.size();
 	return Minimize(machine, matrix, prevMachineSize);
 }
 
